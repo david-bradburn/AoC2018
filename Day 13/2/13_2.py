@@ -61,6 +61,7 @@ class world_map:
 		self.x_world_size = raw_len_x
 		self.track_map = np.empty((raw_len_y, raw_len_x), dtype=str)
 		self.train_map = np.empty_like(self.track_map, dtype='O')
+		self.check_arr = np.empty_like(self.track_map, dtype='O')
 		self.init_input = cleaner_input
 		self.colision_detected = False
 		self.tick_counter = 0
@@ -194,7 +195,7 @@ class world_map:
 	def run_tick(self):
 		self.new_train_map = np.empty_like(self.train_map, dtype = 'O')
 		# print(self.train_map)
-		for row_index, row in enumerate(self.train_map): # one tick
+		for row_index, row in enumerate(self.train_map): 
 			for colum_index, value in enumerate(row):
 				match value:
 					case None:
@@ -205,20 +206,32 @@ class world_map:
 						new_dr, new_loc = self.find_next_direction(cur_dr, [row_index, colum_index])
 						self.train_sum += row_index + 1000*colum_index
 						self.train_map[row_index][colum_index].update_direction_train(new_dr)
-						#udpate location
+						#update location
 						if (self.new_train_map[new_loc[0]][new_loc[1]] == None) and (self.train_map[new_loc[0]][new_loc[1]] == None):#no trains in spot
 							self.new_train_map[new_loc[0]][new_loc[1]] = self.train_map[row_index][colum_index]
+							self.train_map[row_index][colum_index] = None
 						else:
+							##collision
 							self.new_train_map[new_loc[0]][new_loc[1]] = None
 							self.train_map[new_loc[0]][new_loc[1]] = None
+							self.train_map[row_index][colum_index] = None
 							self.no_of_trains -= 2
+
+		
+		
+		# assert(self.train_map.all() == self.check_arr.all())
+		# print(self.train_map)
 					
 		self.train_map = self.new_train_map
+
+		# temp_train_count = self.count_trains()
+		# assert temp_train_count == self.no_of_trains
 
 	def main(self):
 		self.process_input()
 		# self.track_display()
-		while self.no_of_trains != 1:
+		print(self.no_of_trains)
+		while self.no_of_trains > 1:
 			self.run_tick()
 			# self.track_display()
 			# if (self.tick_counter == 117):
@@ -226,12 +239,18 @@ class world_map:
 			print("Tick {} {}".format(self.tick_counter, self.no_of_trains))
 			self.train_sum = 0
 			self.tick_counter += 1
-		print(self.tick_counter)
-		self.track_display()
+		# print(self.tick_counter)
+		self.count_trains()
+		# self.track_display()
+
+	def count_trains(self):
+		temp = 0 
 		for row_index, row in enumerate(self.train_map):
 			for column_index, value in enumerate(row):
 				if value != None:
-					print("{},{}".format(column_index, row_index))
+					temp += 1
+					print("{},{}, {}".format(column_index, row_index, value.current_direction))
+		return temp
 
 
 	def track_display(self):
