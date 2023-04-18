@@ -2,7 +2,7 @@
 ###### https://adventofcode.com/2018/day/2 ######################
 #################################################################
 
-file = "input.txt"
+file = "test.txt"
 
 DAY_NO = "2"
 PART = "2"
@@ -12,7 +12,7 @@ file_path_base = "Day " + DAY_NO + "/misc/"
 with open(file_path_base + file, "r") as fd:
 	rawInput = fd.readlines()
 
-cleanerInput = [row.strip('\n') for row in rawInput]
+cleanerInput = [[element for element in row.strip('\n')] for row in rawInput]
 print(cleanerInput)
 
 class Boxes():
@@ -52,6 +52,10 @@ class Boxes():
 	# 			threeFound = True
 
 	def main(self):
+		for i in self.idData:
+			# i
+			print(i)
+		print(self.idData)
 		pass
 		# for id in self.idData:
 		# 	self.processID(id)
